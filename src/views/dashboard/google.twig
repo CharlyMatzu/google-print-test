@@ -7,6 +7,7 @@
         <p>For use Google Cloud Print is required Google Authentication</p>
         <a href="{{ path_for('google-auth') }}" class="btn btn-primary">Authenticate</a>
     {% else %}
+        <a href="{{ path_for('google-logout') }}" class="btn btn-danger">Logout</a>
         <p>You're authenticated. Now you can configure your default <a href="{{ path_for('dashboard-printers') }}">Printer</a> and see <a href="{{ path_for('dashboard-print-jobs') }}">Print Jobs.</a> See the <a href="{{ path_for('dashboard-tutorial') }}">Tutorial</a> for more information about configure</p>
     {% endif %}
 

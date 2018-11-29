@@ -116,5 +116,7 @@ $app->group('/auth', function () {
         ->setName('google-auth-redirect');
 //        ->addMiddleware('');
 
+    $this->get('/logout[/]', 'AuthController:googleLogout')
+        ->setName('google-logout');
 
 });

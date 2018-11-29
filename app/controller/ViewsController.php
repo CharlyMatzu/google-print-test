@@ -155,7 +155,7 @@ class ViewsController
      */
     public function logout()
     {
-        \App\Includes\Classes\CookieHandler::removeCookie();
+        CookieHandler::removeCookie();
         return $this->response->withRedirect(SERVER_URI . '/login');
     }
 

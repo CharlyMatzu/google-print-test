@@ -9,10 +9,12 @@
 namespace App\controller;
 
 
+use App\Includes\Classes\CookieHandler;
 use App\Includes\Classes\Responses;
 use App\Includes\Exceptions\ClientErrorException;
 use App\Includes\Google\GooglePrint;
 use App\Includes\Google\Request\GoogleAuth;
+use App\Persistence\OAuthPersistence;
 use App\Service\PrintService;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -75,20 +77,17 @@ class AuthController
      * @param $response Response
      * @param $params array
      * @return Response
+     * @throws \App\Includes\Exceptions\PersistenceException
      */
-//    public function googleLogout($request, $response, $params = []){
-//
-//        try{
-//            $serv = new PrintService();
-//            $serv->logoutGoogle();
-//            return $response
-//                ->withRedirect(SERVER_URI . '/dashboard/integrations');
-//
-//        }catch (RequestException $ex){
-//            return $response
-//                ->withStatus( $ex->getStatusCode() )
-//                ->withJson( $ex->getMessage()  );
-//        }
-//    }
+    public function googleLogout($request, $response, $params = []){
+        $userId = CookieHandler::getCookieData();
+        $access = OAuthPersistence::getPrintAccess_byUser( $userId );
+
+        // Update STATUS
+        OAuthPersistence::updateAccessStatus( $userId, GoogleAuth::STATUS_OFF );
+        // Redirect
+        return $response->withRedirect(SERVER_URI . '/dashboard/google', Responses::TEMPORARY_REDIRECT);
+    }
+
 
 }

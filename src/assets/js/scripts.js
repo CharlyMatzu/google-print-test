@@ -15,6 +15,7 @@ $(document).ready(function () {
             method: 'POST',
             data: login,
             beforeSend: function(){
+                // TODO: remove and create element
                 message.text("Loading....");
                 message.addClass("alert-warning");
                 message.removeClass("d-none");
@@ -27,7 +28,7 @@ $(document).ready(function () {
             },
             error: function(error){
                 message.addClass("alert-danger");
-                message.text( error.responseText );
+                message.text( error.responseJSON.Message );
             },
             complete: function(response){
                 message.removeClass("alert-warning");

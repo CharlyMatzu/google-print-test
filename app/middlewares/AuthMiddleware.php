@@ -32,11 +32,12 @@ class AuthMiddleware
     public function midd_validateLogout($request, $response, $next){
         $userId = CookieHandler::getCookieData();
         // validate user
-        $user = UserPersistence::getUser_byId( $userId );
-        if( $user )
-            return $response->withRedirect(SERVER_URI . '/dashboard');
-
-            // Call next callable method
+        if( $userId ) {
+            $user = UserPersistence::getUser_byId($userId);
+            if ($user)
+                return $response->withRedirect(SERVER_URI . '/dashboard');
+        }
+        // Call next callable method
         $res = $next($request, $response);
         return $res;
     }
@@ -50,10 +51,11 @@ class AuthMiddleware
      */
     public function midd_validateLogin($request, $response, $next){
         $userId = CookieHandler::getCookieData();
-        // validate user
-        $user = UserPersistence::getUser_byId( $userId );
-        if( !$user )
-            return $response->withRedirect(SERVER_URI . '/login');
+        if( $userId ) {
+            $user = UserPersistence::getUser_byId($userId);
+            if (!$user)
+                return $response->withRedirect(SERVER_URI . '/login');
+        }
 
         // Call next callable method
         $res = $next($request, $response);

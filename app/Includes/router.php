@@ -93,10 +93,16 @@ $app->group('/dashboard', function () {
 //  API ROUTES
 //---------------------------------------------
 $app->group('/api', function () {
+
+    //------- Login
     $this->post('/login[/]', 'APIController:login');
 
-    // Google cloud print
+    //-------- Google cloud print
     $this->post('/print/submit[/]', 'APIController:print_submit');
+
+    $this->post('/print/set', 'APIController:print_setDefault');
+
+//    $this->post('/print/printer/remove', 'APIController:print_removeDefault');
 
 });
 
@@ -110,7 +116,7 @@ $app->group('/auth', function () {
     $this->get('/google[/]', 'AuthController:googleAuth')
         ->setName('google-auth');
 
-    // TODO: add specific app callback param
+    // TODO: validate params
     $this->get('/callback[/]', 'AuthController:authCallback')
         ->setName('google-auth-redirect');
 //        ->addMiddleware('');

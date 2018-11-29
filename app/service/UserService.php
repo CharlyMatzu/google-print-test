@@ -39,7 +39,7 @@ class UserService
     public function signIn($user, $pass){
         $result = UserPersistence::signIn($user, $pass);
         if( empty($result) )
-            throw new ClientErrorException( Responses::UNAUTHORIZED, "User login does not exists" );
+            throw new ClientErrorException( Responses::UNAUTHORIZED, "User or Password incorrect" );
 
         // save cookie session if user exists
         // TODO: add more security

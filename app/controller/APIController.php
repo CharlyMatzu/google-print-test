@@ -41,7 +41,7 @@ class APIController
         }catch (ClientErrorException $ex){
             return $response
                 ->withStatus( $ex->getStatusCode() )
-                ->withJson( $ex->getMessage()  );
+                ->write( $ex->getMessage()  );
         }
     }
 
@@ -57,6 +57,7 @@ class APIController
      */
     public function print_submit($request, $response){
         try{
+            // TODO: validate param
             $params = $request->getParsedBody();
             $this->printServ->sendToPrint( $params['document'] );
 
@@ -69,6 +70,46 @@ class APIController
         }
     }
 
+
+    /**
+     * @param       $request Request
+     * @param       $response Response
+     * @return Response
+     * @throws \App\Includes\Exceptions\PersistenceException
+     */
+    public function print_setDefault($request, $response){
+        try{
+            $params = $request->getParsedBody();
+            // TODO: validate param
+            $this->printServ->setPrinter( $params['printerId'] );
+            return Responses::makeMessageResponse($response, Responses::OK, "Set Printer");
+
+        }catch (ClientErrorException $ex){
+            return $response
+                ->withStatus( $ex->getStatusCode() )
+                ->withJson( $ex->getMessage()  );
+        }
+    }
+
+
+    /**
+     * @param       $request Request
+     * @param       $response Response
+     * @param array $params
+     * @return Response
+     * @throws \App\Includes\Exceptions\PersistenceException
+     */
+    public function print_removeDefault($request, $response, $params = []){
+        try{
+            $this->printServ->setPrinter( $params['printer_id'] );
+            return Responses::makeMessageResponse($response, Responses::OK, "Set Printer");
+
+        }catch (ClientErrorException $ex){
+            return $response
+                ->withStatus( $ex->getStatusCode() )
+                ->withJson( $ex->getMessage()  );
+        }
+    }
 
 
 }

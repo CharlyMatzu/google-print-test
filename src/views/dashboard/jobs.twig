@@ -3,6 +3,8 @@
 {% block content %}
     <h2>Printer Jobs</h2>
 
+    <!-- Status -->
+    <div id="signalr-status"></div>
     <!-- SignalR Simulation -->
     <input type="text" class="form-control" id="inputDoc" placeholder="URL" value="http://www.africau.edu/images/default/sample.pdf">
     <button class="btn btn-primary" onclick="simulate()">Simulate SignalR notify</button>
@@ -10,12 +12,16 @@
 
     <div class="row">
         <div class="col-xs-12 col-md-4">
-            {% if PRINTER != '' %}
+            {% if PRINTER|length > 0 %}
                 <div class="card text-white bg-success">
                     <div class="card-body">
-                        <h5 class="card-title">Current Selected Printer</h5>
-                        <p class="card-text"><span id="id-printer">{{ PRINTER.id }}</span></p>
+                        <h5 class="card-title">Current Selected Printer </h5>
+                        <p class="card-text">
+                            <span id="id-printer">{{ PRINTER.name }}</span><br>
+                            <span id="id-printer">{{ PRINTER.id }}</span>
+                        </p>
                         <a href="{{ path_for('dashboard-printers') }}" class="btn btn-light">Go to settings</a>
+                        <span class="badge badge-dark">{{ PRINTER.connectionStatus }}</span>
                     </div>
                 </div>
             {% else %}

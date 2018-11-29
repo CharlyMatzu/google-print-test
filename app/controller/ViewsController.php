@@ -83,10 +83,11 @@ class ViewsController
         // Current selected printer
         $userId = CookieHandler::getCookieData();
         $access = OAuthPersistence::getPrintAccess_byUser( $userId );
-        $printer = [
-            'id'   => $access['printer_id'],
-            'name' => $access['printer_name']
-        ];
+        $printer = array();
+        if( !empty($access['printer_id']) ) {
+            // Get Full Printer info
+            $printer = $serv->getPrinter($access['printer_id']);
+        }
 
         return $this->view
             ->render($this->response, 'jobs.twig', [

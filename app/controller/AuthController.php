@@ -44,9 +44,12 @@ class AuthController
                 return $response
                     ->withRedirect(SERVER_URI . '/dashboard/google');
 
+
+            $userId = CookieHandler::getCookieData();
+
             // get code request
             $serv = new AuthService();
-            $result = $serv->authorize($params['code'], 1);
+            $result = $serv->authorize($params['code'], $userId);
 
             // redirect to google auth
             return $response

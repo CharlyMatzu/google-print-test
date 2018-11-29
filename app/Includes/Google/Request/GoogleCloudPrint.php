@@ -1,6 +1,7 @@
 <?php namespace App\Includes\Google\Request;
 
 use App\Includes\Classes\Responses;
+use App\Includes\Exceptions\ClientErrorException;
 use App\Includes\Exceptions\CurlErrorException;
 use App\Includes\Exceptions\RefreshRequiredException;
 use App\Includes\Exceptions\RequestException;
@@ -23,6 +24,7 @@ class GoogleCloudPrint{
      * @return object
      * @throws CurlErrorException
      * @throws RefreshRequiredException
+     * @throws ClientErrorException
      */
     public static function sendToPrint($token, $printerId, $title, $documentURl, $type){
         // Get cURL resource
@@ -57,10 +59,11 @@ class GoogleCloudPrint{
         $resp = curl_exec($curl);
         $httpCode = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
         if ( !$resp ){
+
             if( $httpCode === Responses::FORBIDDEN )
                 throw new RefreshRequiredException("submit");
-
-            throw new CurlErrorException( curl_error($curl) );
+            else
+                throw new CurlErrorException( curl_error($curl) );
         }
 
         curl_close( $curl );

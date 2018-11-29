@@ -9,21 +9,14 @@ CREATE TABLE user(
 );
 
 
--- CREATE TABLE app(
--- app_id 		INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
--- app_name		VARCHAR(20) NOT NULL UNIQUE,
--- client_id	VARCHAR(20) NOT NULL UNIQUE,
--- password_id VARCHAR(20) NOT NULL UNIQUE
--- 
--- );
-
-
 CREATE TABLE oauth_access(
 	id 				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	refresh_token  VARCHAR(255) NOT NULL,
 	token				VARCHAR(255) NOT NULL,
 	token_expires  INT NOT NULL,
+	
 	printer_id		VARCHAR(255),
+	printer_name	VARCHAR(255),
 	
 	date_register 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	date_update		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -12,6 +12,8 @@ namespace App\controller;
 use App\Includes\Classes\CookieHandler;
 use App\Includes\Google\Request\GoogleAuth;
 use App\Persistence\OAuthPersistence;
+use App\service\AuthService;
+use App\Service\PrintService;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -75,42 +77,51 @@ class ViewsController
      */
     public function renderDashboard_jobs()
     {
-        $serv = new \App\Service\PrintService();
+        $serv = new PrintService();
         $jobs = $serv->getPrintJobs();
-        // TODO: verify default printer status
+
+        // Current selected printer
+        $userId = CookieHandler::getCookieData();
+        $access = OAuthPersistence::getPrintAccess_byUser( $userId );
+        $printer = [
+            'id'   => $access['printer_id'],
+            'name' => $access['printer_name']
+        ];
 
         return $this->view
             ->render($this->response, 'jobs.twig', [
-                'HOST' => SERVER_URI,
-                'TITLE' => 'Printer Jobs',
-                'PAGE' => 'jobs',
-                'JOBS' => $jobs['jobs']
+                'HOST'      => SERVER_URI,
+                'TITLE'     => 'Printer Jobs',
+                'PAGE'      => 'jobs',
+                'JOBS'      => $jobs['jobs'],
+                'PRINTER'   => $printer
             ]);
     }
 
     /**
      * Render printers page
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \App\Includes\Exceptions\CurlErrorException
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws \App\Includes\Exceptions\RefreshRequiredException
      */
     public function renderDashboard_printers()
     {
-//        $userId = \App\Includes\Classes\CookieHandler::getCookieData();
-//        $serv = new \App\Service\PrintService();
-//        $access = $serv->getGooglePrintAccess_byUser( $userId );
-
-//        // set params
-//        $params = [
-//            'HOST' => SERVER_URI,
-//            'TITLE' => 'Integrations',
-//        ];
-//        if( $access['status'] === OAuthPersistence::STATUS_ON )
-//            $params['GOOGLE'] = $access;
+        // Printers
+        $serv = new PrintService();
+        $printers = $serv->getPrinters();
+        // Current selected printer
+        $userId = CookieHandler::getCookieData();
+        $access = OAuthPersistence::getPrintAccess_byUser( $userId );
+        $default = $access['printer_id'];
 
         return $this->view
             ->render($this->response, 'printers.twig', [
-                'HOST' => SERVER_URI,
-                'TITLE' => 'Printers',
-                'PAGE' => 'printers'
+                'HOST'      => SERVER_URI,
+                'TITLE'     => 'Printers',
+                'PAGE'      => 'printers',
+                'PRINTERS'  => $printers['printers'],
+                'DEFAULT'   => $default
             ]);
     }
 

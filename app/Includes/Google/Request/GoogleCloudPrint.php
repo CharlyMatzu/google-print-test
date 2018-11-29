@@ -11,7 +11,7 @@ class GoogleCloudPrint{
     const SUBMIT    = '/submit';
     const SEARCH    = '/search';
     const JOBS      = '/jobs';
-    const PRINTERS  = '/printer';
+    const PRINTER  = '/printer';
 
 
 
@@ -127,6 +127,44 @@ class GoogleCloudPrint{
         if ( !$resp ){
             if( $httpCode === Responses::FORBIDDEN )
                 throw new RefreshRequiredException("getJobs");
+
+            throw new CurlErrorException( curl_error($curl) );
+        }
+
+
+        curl_close( $curl );
+        // parse
+        return json_decode($resp, true);
+    }
+
+
+    /**
+     * @param $token
+     * @return object
+     * @throws CurlErrorException
+     * @throws RefreshRequiredException
+     */
+    public static function getPrinters($token)
+    {
+        // Get cURL resource
+        $curl = curl_init();
+        // Set some options - we are passing in a useragent too here
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_URL             => self::HOST . self::SEARCH,
+            CURLOPT_USERAGENT       => 'Emphasys',
+            CURLOPT_FAILONERROR     => true,
+            CURLOPT_HTTPHEADER      => [
+                "Authorization: Bearer $token"
+            ]
+        ));
+
+        // Send the request & save response to $resp
+        $resp = curl_exec($curl);
+        $httpCode = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+        if ( !$resp ){
+            if( $httpCode === Responses::FORBIDDEN )
+                throw new RefreshRequiredException("getPrinters");
 
             throw new CurlErrorException( curl_error($curl) );
         }

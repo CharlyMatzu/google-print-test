@@ -7,6 +7,29 @@
     <button class="btn btn-primary">Simulate SignalR notify</button>
     <br><br>
 
+    <div class="row">
+        <div class="col-xs-12 col-md-4">
+            {% if PRINTER != '' %}
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">Current Selected Printer</h5>
+                        <p class="card-text"><span id="id-printer">{{ PRINTER.id }}</span></p>
+                        <a href="{{ path_for('dashboard-printers') }}" class="btn btn-light">Go to settings</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">Printer not selected</h5>
+                        <a href="{{ path_for('dashboard-printers') }}" class="btn btn-light">Go to settings</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <br><br>
+
+
     <!-- DataTables Example -->
     <div class="card mb-3">
         <div class="card-header">
@@ -46,7 +69,8 @@
                                 <p>{{ job.printerName }}</p>
                                 <p>{{ job.printerid }}</p>
                             </td>
-                            <td>{{ job.createTime | date("Y/d/m h:i:s A") }}</td>
+                            {#<td>{{ job.createTime | date("Y/d/m h:i:s A") }}</td>#}
+                            <td>{{ job.createTime }}</td>
                             <td><span class="badge badge-success">{{ job.status }}</span></td>
                         </tr>
                     {% endfor %}

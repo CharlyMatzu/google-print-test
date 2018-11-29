@@ -1,6 +1,7 @@
 <?php namespace App\Includes\Exceptions;
 
 
+use App\Includes\Classes\Responses;
 use \Exception;
 
 /**
@@ -11,7 +12,7 @@ use \Exception;
  */
 class ServerErrorException extends RequestException
 {
-    public function __construct($statusCode, $message){
-        parent::__construct($statusCode, $message);
+    public function __construct($message){
+        parent::__construct(Responses::INTERNAL_SERVER_ERROR, $message);
     }
 }

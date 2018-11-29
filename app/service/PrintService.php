@@ -3,6 +3,8 @@
 use App\Includes\Classes\CookieHandler;
 use App\Includes\Exceptions\CurlErrorException;
 use App\Includes\Exceptions\RefreshRequiredException;
+use App\Includes\Exceptions\ServerErrorException;
+use App\Includes\Google\GooglePrint;
 use App\Includes\Google\Request\GoogleAuth;
 use App\Includes\Google\Request\GoogleCloudPrint;
 use App\Persistence\OAuthPersistence;
@@ -104,8 +106,35 @@ class PrintService{
     }
 
 
+    /**
+     * @param $document
+     * @return array|object
+     * @throws CurlErrorException
+     * @throws RefreshRequiredException
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws ServerErrorException
+     */
     public function sendToPrint($document){
+        // Get credentials
+        $userId = CookieHandler::getCookieData();
+        $access = OAuthPersistence::getPrintAccess_byUser( $userId );
+        // Request
+        $submit = array();
+        try {
+            $submit = GoogleCloudPrint::sendToPrint( $access['token'], $access['printer_id'], 'TEST', $document, GooglePrint::URL );
+        } catch (RefreshRequiredException $e) {
+            // If refresh is required, request refresh token
+            // TODO: make callable for multi usage  (use callbacks)
+            $access = $this->refreshToken();
+            // try again
+            $submit = GoogleCloudPrint::sendToPrint( $access['token'], $access['printer_id'], 'TEST', $document, GooglePrint::URL );
+        }
 
+        // TODO: handle 'success: false'
+        if( !$submit['success'] )
+            throw new ServerErrorException("Submit error: " . $submit['message']);
+
+        return $submit;
     }
 
 

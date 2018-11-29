@@ -2,6 +2,7 @@
 
 use App\Includes\Classes\Responses;
 use App\Includes\Exceptions\ClientErrorException;
+use App\Service\PrintService;
 use App\Service\UserService;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -9,9 +10,12 @@ use Slim\Http\Response;
 class APIController
 {
 
-    private $service;
+    private $userServ;
+    private $printServ;
+
     function __construct() {
-        $this->service = new UserService();
+        $this->userServ = new UserService();
+        $this->printServ = new PrintService();
     }
 
 
@@ -29,10 +33,34 @@ class APIController
             // get params
             $params = $request->getParsedBody();
             // Search and assign cookie
-            $result = $this->service->signIn( $params['user'], $params['pass'] );
+            $result = $this->userServ->signIn( $params['user'], $params['pass'] );
 
             return $response
                 ->withStatus( Responses::OK );
+
+        }catch (ClientErrorException $ex){
+            return $response
+                ->withStatus( $ex->getStatusCode() )
+                ->withJson( $ex->getMessage()  );
+        }
+    }
+
+
+    /**
+     * @param $request Request
+     * @param $response Response
+     * @return Response
+     * @throws \App\Includes\Exceptions\CurlErrorException
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws \App\Includes\Exceptions\RefreshRequiredException
+     * @throws \App\Includes\Exceptions\ServerErrorException
+     */
+    public function print_submit($request, $response){
+        try{
+            $params = $request->getParsedBody();
+            $this->printServ->sendToPrint( $params['document'] );
+
+            return Responses::makeMessageResponse($response, Responses::OK, "Document sent");
 
         }catch (ClientErrorException $ex){
             return $response

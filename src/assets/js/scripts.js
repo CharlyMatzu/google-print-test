@@ -38,5 +38,29 @@ $(document).ready(function () {
     
     });
 
-
 });
+
+function simulate() {
+    let document = $('#inputDoc').val();
+    sendNotify( document );
+}
+
+
+function sendNotify(documentURL) {
+    // send request
+    $.ajax({
+        url:    '/api/print/submit',
+        method: 'POST',
+        data: { 'document': documentURL },
+        success: function(response){
+            // console.log(response)
+        },
+        error: function(error){
+            // console.log(error);
+        },
+        complete: function(response){
+            console.log( response );
+        }
+    }); // end ajax
+
+}

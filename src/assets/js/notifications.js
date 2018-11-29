@@ -35,7 +35,7 @@ function setConnection(hostUrl, retry){
     //Listen notifications
     connection.on("NotificationPrint", ( url ) => {
         console.log("Recibido");
-        $('#notificaciones').append('<div class="item-mensaje">' +url+ '</div>')
+
     });
 }
 

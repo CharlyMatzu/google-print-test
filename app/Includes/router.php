@@ -96,7 +96,7 @@ $app->group('/api', function () {
     $this->post('/login[/]', 'APIController:login');
 
     // Google cloud print
-    
+    $this->post('/print/submit[/]', 'APIController:print_submit');
 
 });
 

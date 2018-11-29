@@ -1,0 +1,65 @@
+{% extends "_base_dashboard.twig" %}
+
+
+{% block content %}
+    <style>
+        .card-image img{
+            height: 80px;
+        }
+
+        .card-footer:hover{
+            background-color: #575757;
+        }
+    </style>
+
+    <h2>Integrations</h2>
+    <h4>Google cloud print printer registration</h4>
+
+    <p>
+        <a href="https://www.google.com/cloudprint/enable_chrome_connector/enable.html" target="_blank">Add Printers</a>
+        <br>
+        <a href="https://www.google.com/cloudprint/" target="_blank">Google Cloud Print Dashboard</a>
+    </p>
+
+    <h4>Applications</h4>
+
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-3">
+            <div class="card text-white {{ (GOOGLE.status) ? 'bg-success' : 'bg-primary' }} o-hidden h-100">
+                <div class="card-body">
+                    <div class="card-body-icon">
+                        <i class="fas fa-fw fa-"></i>
+                    </div>
+                    <div class="card-image">
+                        <img src="{{ HOST }}/src/assets/img/google-cloud-print.png" alt="">
+                    </div>
+                    <div class="mr-5"><strong>Google cloud Print</strong></div>
+                </div>
+
+                {% if GOOGLE.status == 'ON' %}
+                    <a href="{{ path_for('google-logout') }}" class="card-footer text-white clearfix small z-1">
+                        <span class="float-left">Logout account</span>
+                        <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="card-footer text-white clearfix small z-1">
+                        <span class="float-left">Settings</span>
+                        <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                    </a>
+                {% else %}
+                    <a href="{{ path_for('google-auth') }}" class="card-footer text-white clearfix small z-1">
+                        <span class="float-left">INTEGRATE</span>
+                        <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

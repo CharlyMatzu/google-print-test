@@ -1,0 +1,56 @@
+{% extends "_base_dashboard.twig" %}
+
+{% block content %}
+    <h2>Printer Jobs</h2>
+
+    <!-- SignalR Simulation -->
+    <button class="btn btn-primary">Simulate SignalR notify</button>
+    <br><br>
+
+    <!-- DataTables Example -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Jobs List
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <!-- head title -->
+                    <thead>
+                    <tr>
+                        <th>Job Id</th>
+                        <th>Document</th>
+                        <th>Printer</th>
+                        <th>date</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <!-- foot title -->
+                    <tfoot>
+                    <tr>
+                        <th>Job Id</th>
+                        <th>Document</th>
+                        <th>Printer</th>
+                        <th>date</th>
+                        <th>Status</th>
+                    </tr>
+                    </tfoot>
+                    <!-- Content -->
+                    <tbody>
+                    <tr>
+                        <td>1ef74ff6-4a26-07c6-2ff4-d0f2b2c13b4b</td>
+                        <td>Document.pdf</td>
+                        <td>
+                            <p>Foxit Reader PDF Printer</p>
+                            <p>90c41228-7d83-24c8-cba6-7662fe705dfb</p>
+                        </td>
+                        <td>27 nov. 2018 09:41:45</td>
+                        <td><span class="badge badge-success">DONE</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

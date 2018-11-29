@@ -62,7 +62,6 @@ class GoogleAuth{
             'grant_type'    => 'refresh_token',
         ));
 
-        // TODO: handle error codes
         if ( $curl->error )
             throw new CurlErrorException("Request Error: " . $curl->errorCode . ' - ' . $curl->errorMessage );
 
@@ -81,17 +80,21 @@ class GoogleAuth{
      * @return string
      */
     public static function getAuthUrl($scopes){
-        $provider = new Google([
-            'clientId'      => CLIENT_ID,
-            'clientSecret'  => CLIENT_SECRET,
-            'redirectUri'   => REDIRECT_URI
-        ]);
-        // TODO: use own url generator
-        return  $provider->getAuthorizationUrl([
-            'access_type' => 'offline', // when the user is not present at the browser.
-            'state' => STATE, // Random state is generated when empty option
-            'scope' => $scopes
-        ]);
+        $params = [
+            'access_type'   => 'offline',
+            'state'         => STATE,
+            'scope'         => implode(',', $scopes),
+            'response_type' => 'code',
+            'redirect_uri'  => REDIRECT_URI
+        ];
+        return self::AUTH_URL."?".
+            "scope=".$params['scope']."&".
+            "access_type=".$params['access_type']."&".
+            "include_granted_scopes=true&".
+            "state=".$params['state']."&".
+            "redirect_uri=".$params['redirect_uri']."&".
+            "response_type=".$params['response_type']."&".
+            "client_id=".CLIENT_ID;
     }
 
 }

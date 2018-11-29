@@ -1,6 +1,8 @@
 <?php namespace App\Includes\Google\Request;
 
 use App\Includes\Classes\Responses;
+use App\Includes\Exceptions\CurlErrorException;
+use App\Includes\Exceptions\RefreshRequiredException;
 use App\Includes\Exceptions\RequestException;
 use Curl\Curl;
 
@@ -69,38 +71,70 @@ class GoogleCloudPrint{
     /**
      * @param $token String
      * @return object
-     * @throws RequestException
-     * @throws \ErrorException
+     * @throws CurlErrorException
+     * @throws RefreshRequiredException
      */
-    public static function getJobs($token){
+//    public static function getJobs($token){
+//        try {
+//            // Get cURL resource
+//            $curl = new Curl();
+//            // set
+//            $curl->setHeader('Authorization', "Bearer $token");
+//            $curl->setUserAgent( 'Emphasys' );
+//            $curl->get('https://www.google.com/cloudprint');
+//
+//            if( $curl->error ) {
+//                if ( $curl->errorCode === Responses::FORBIDDEN )
+//                    throw new RefreshRequiredException("Expired Token");
+//                else
+//                    throw new CurlErrorException("Request Error: " . $curl->errorCode . ' - ' . $curl->errorMessage);
+//            }
+//
+//
+//            $response = $curl->response;
+//            $curl->close();
+//            return $response;
+//
+//        } catch (\ErrorException $e) {
+//            throw new CurlErrorException( $e->getMessage() );
+//        }
+//
+//    }
+
+    /**
+     * @param $token
+     * @return object
+     * @throws CurlErrorException
+     * @throws RefreshRequiredException
+     */
+    public static function getJobs( $token ){
         // Get cURL resource
-        $curl = new Curl();
-        $curl->setHeader('Authorization', "Bearer $token");
-        $curl->get('https://www.google.com/cloudprint');
+        $curl = curl_init();
+        // Set some options - we are passing in a useragent too here
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_URL             => self::HOST . self::JOBS,
+            CURLOPT_USERAGENT       => 'Emphasys',
+            CURLOPT_FAILONERROR     => true,
+            CURLOPT_HTTPHEADER      => [
+                "Authorization: Bearer $token"
+            ]
+        ));
 
-        // TODO: handle error codes
-        if( $curl->error ) {
-            // TODO: when is 403 error code, trigger refresh token request
-            if ($curl->errorCode === Responses::FORBIDDEN){
+        // Send the request & save response to $resp
+        $resp = curl_exec($curl);
+        $httpCode = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+        if ( !$resp ){
+            if( $httpCode === Responses::FORBIDDEN )
+                throw new RefreshRequiredException("getJobs");
 
-            }
-            else
-                throw new RequestException($curl->errorCode, "Request Error: " . $curl->errorCode . ' - ' . $curl->errorMessage);
+            throw new CurlErrorException( curl_error($curl) );
         }
 
 
-        $response = $curl->response;
-        $curl->close();
-        return $response;
-    }
-
-
-    public static function deleteJob($token, $jobId){
-
-    }
-
-    public static function getPrinterInfo($token, $printerId){
-
+        curl_close( $curl );
+        // parse
+        return json_decode($resp, true);
     }
 
 }

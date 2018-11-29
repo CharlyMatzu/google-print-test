@@ -35,7 +35,7 @@ class AuthMiddleware
         if( $userId ) {
             $user = UserPersistence::getUser_byId($userId);
             if ($user)
-                return $response->withRedirect(SERVER_URI . '/dashboard');
+                return $response->withRedirect(SERVER_URI . '/dashboard/jobs');
         }
         // Call next callable method
         $res = $next($request, $response);

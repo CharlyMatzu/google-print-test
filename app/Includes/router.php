@@ -94,12 +94,11 @@ $app->group('/dashboard', function () {
 //---------------------------------------------
 $app->group('/api', function () {
     $this->post('/login[/]', 'APIController:login');
+
+    // Google cloud print
+    
+
 });
-
-//$app->group('/api', function () {
-//    $this->post('/[/]', 'APIController:login');
-//});
-
 
 //---------------------------------------------
 //  AUTH ROUTES

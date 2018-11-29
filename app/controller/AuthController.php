@@ -15,7 +15,7 @@ use App\Includes\Exceptions\ClientErrorException;
 use App\Includes\Google\GooglePrint;
 use App\Includes\Google\Request\GoogleAuth;
 use App\Persistence\OAuthPersistence;
-use App\Service\PrintService;
+use App\service\AuthService;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -45,7 +45,7 @@ class AuthController
                     ->withRedirect(SERVER_URI . '/dashboard/google');
 
             // get code request
-            $serv = new PrintService();
+            $serv = new AuthService();
             $result = $serv->authorize($params['code'], 1);
 
             // redirect to google auth

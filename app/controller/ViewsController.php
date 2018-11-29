@@ -69,17 +69,22 @@ class ViewsController
     /**
      * Render jobs page
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \App\Includes\Exceptions\CurlErrorException
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws \App\Includes\Exceptions\RefreshRequiredException
      */
     public function renderDashboard_jobs()
     {
-//        $serv = new \App\Service\PrintService();
-//        $jobs = $serv->getPrinterJobs();
+        $serv = new \App\Service\PrintService();
+        $jobs = $serv->getPrintJobs();
+        // TODO: verify default printer status
 
         return $this->view
             ->render($this->response, 'jobs.twig', [
                 'HOST' => SERVER_URI,
                 'TITLE' => 'Printer Jobs',
-                'PAGE' => 'jobs'
+                'PAGE' => 'jobs',
+                'JOBS' => $jobs['jobs']
             ]);
     }
 

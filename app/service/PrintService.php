@@ -1,9 +1,8 @@
 <?php namespace App\Service;
 
 use App\Includes\Classes\CookieHandler;
-use App\Includes\Classes\Responses;
-use App\Includes\Exceptions\ClientErrorException;
-use App\Includes\Exceptions\RequestException;
+use App\Includes\Exceptions\CurlErrorException;
+use App\Includes\Exceptions\RefreshRequiredException;
 use App\Includes\Google\Request\GoogleAuth;
 use App\Includes\Google\Request\GoogleCloudPrint;
 use App\Persistence\OAuthPersistence;
@@ -12,40 +11,6 @@ class PrintService{
 
     public function __construct() {}
 
-
-    /**
-     * request token using authorization code
-     *
-     * @param $code String authorization code
-     * @param $userId int User id
-     * @return array|bool|mixed|
-     * @throws ClientErrorException
-     * @throws \App\Includes\Exceptions\CurlErrorException
-     * @throws \App\Includes\Exceptions\PersistenceException
-     */
-    public function authorize($code, $userId){
-        //User exists validation
-        $userServ = new UserService();
-        if( !$userServ->isUserExist( $userId ) )
-            throw new ClientErrorException( Responses::NOT_FOUND, "User does not exist");
-
-        // Get Token
-        $auth = GoogleAuth::authorizeRequest($code);
-
-        //---------- Token register
-        // Get Google access
-        $user = OAuthPersistence::getPrintAccess_byUser($userId);
-
-        // if user is already registered data will update
-        if( !empty($user) )
-            $result = OAuthPersistence::updatePrinterAccess( $auth->access_token, $auth->expires_in, $auth->token_type, $userId );
-        else
-            $result = OAuthPersistence::insertPrinterAccess( $auth->access_token, $auth->expires_in, $auth->token_type, $userId );
-
-        // update status
-        $result = OAuthPersistence::updateAccessStatus($userId, GoogleAuth::STATUS_ON);
-        return true;
-    }
 
 
     /**
@@ -64,52 +29,49 @@ class PrintService{
         return $access;
     }
 
+
     /**
-     * @throws RequestException
+     * Request a refresh token and update oauth access
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws CurlErrorException
      */
-    public function logoutGoogle() {
-        try {
-            // TODO: validate user
-            $userId = CookieHandler::getCookieData();
-            // change status access as OFF
-            return OAuthPersistence::updateAccessStatus($userId, GoogleAuth::STATUS_OFF);
-
-        } catch (\Exception $e) {
-            throw new RequestException(Responses::INTERNAL_SERVER_ERROR, $e->getMessage());
-        }
-
+    public function refreshToken(){
+        $userId = CookieHandler::getCookieData();
+        $access = OAuthPersistence::getPrintAccess_byUser( $userId );
+        // TODO: validate status
+        $data = GoogleAuth::refreshToken( $access['refresh_token'] );
+        OAuthPersistence::updateTokenAccess_byUser( $data, $data, $userId );
+        return $data;
     }
 
 
     //----------------------------------------
     // GOOGLE CLOUD PRINT
     //----------------------------------------
-
     /**
-     * @throws \Exception
+     * @return object
+     * @throws \App\Includes\Exceptions\PersistenceException
+     * @throws CurlErrorException
+     * @throws RefreshRequiredException
      */
-    public function getPrinterJobs(){
+    public function getPrintJobs(){
 
-        // TODO: handle empty
+        // Get credentials
         $userId = CookieHandler::getCookieData();
         $access = OAuthPersistence::getPrintAccess_byUser( $userId );
-        if( !empty($access) )
-            return $access;
+        // Request
+        $jobs = array();
+        try {
+            $jobs = GoogleCloudPrint::getJobs( $access['token'] );
+        } catch (RefreshRequiredException $e) {
+            // If refresh is required, request refresh token
+            // TODO: make callable for multi usage  (use callbacks)
+            $access = $this->refreshToken();
+            // try again
+            $jobs = GoogleCloudPrint::getJobs( $access['token'] );
+        }
 
-        // TODO: handle access correctly
-
-//        if( empty($access) )
-//            throw new RequestException(Responses::NO_CONTENT, "");
-//        else if( $access[0]['status'] === OAuthPersistence::STATUS_OFF ){
-//            throw new RequestException(Responses::NO_CONTENT, "");
-//        }
-//        else{
-//
-//        }
-
-        $result = GoogleCloudPrint::getJobs( $access['token'] );
-
-        return $result;
+        return $jobs;
     }
 
 

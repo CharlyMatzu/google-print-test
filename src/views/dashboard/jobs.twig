@@ -38,16 +38,18 @@
                     </tfoot>
                     <!-- Content -->
                     <tbody>
-                    <tr>
-                        <td>1ef74ff6-4a26-07c6-2ff4-d0f2b2c13b4b</td>
-                        <td>Document.pdf</td>
-                        <td>
-                            <p>Foxit Reader PDF Printer</p>
-                            <p>90c41228-7d83-24c8-cba6-7662fe705dfb</p>
-                        </td>
-                        <td>27 nov. 2018 09:41:45</td>
-                        <td><span class="badge badge-success">DONE</span></td>
-                    </tr>
+                    {% for job in JOBS %}
+                        <tr>
+                            <td>{{ job.id }}</td>
+                            <td>{{ job.title }}</td>
+                            <td>
+                                <p>{{ job.printerName }}</p>
+                                <p>{{ job.printerid }}</p>
+                            </td>
+                            <td>{{ job.createTime | date("Y/d/m h:i:s A") }}</td>
+                            <td><span class="badge badge-success">{{ job.status }}</span></td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
